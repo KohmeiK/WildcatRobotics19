@@ -1,0 +1,95 @@
+#include "robot-config.h"
+
+
+    /*
+        Code written by Rider Bishop. This code works with both an arcade and tank control. 
+        The 2 modes can be switched by holding X for 3 seconds.
+        Version 1.4 (10/17/18)
+        Changed xPressed int vairable to be a boolean.
+    */
+        
+void launch() { 
+    
+    //rotate the launcher motor one rotation, so the arm throws the ball
+    LauncherMotor.rotateFor(360, deg);
+    }
+
+int main() {
+	
+    Brain.Screen.print("Robot Control Started");
+	vex::task::sleep(1000);
+    
+    //
+	bool drivingMode = true;
+	/*  motors
+	
+	upRight
+	downLeft
+	downRight
+	intakeMotor
+	launcherMotor		
+	*/
+    
+    while(1){
+        
+	    while(drivingMode) {
+
+		    Brain.Screen.print("Arcade Control mode active");
+
+    	    //for driving forward and backward (there is no turning)
+		
+		    UpLeft.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);          
+		    UpRight.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
+		    DownLeft.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
+		    DownRight.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
+
+		    //for turning left (might need to change the negitives to the other motors, cuz i dont know the layout, or just completly change them)
+		    if(Controller1.Axis4.value() <= -25){
+			    UpLeft.spin(directionType::rev,(Controller1.Axis4.value()),velocityUnits::pct);          
+			    UpRight.spin(directionType::fwd,(Controller1.Axis4.value()),velocityUnits::pct);
+			    DownLeft.spin(directionType::rev,(Controller1.Axis4.value()),velocityUnits::pct);
+			    DownRight.spin(directionType::fwd,(Controller1.Axis4.value()),velocityUnits::pct);
+		    }
+
+		    //for turning right
+		    if(Controller1.Axis4.value() >= 25){
+                UpLeft.spin(directionType::fwd,(Controller1.Axis4.value()),velocityUnits::pct);          
+			    UpRight.spin(directionType::rev,(Controller1.Axis4.value()),velocityUnits::pct);
+			    DownLeft.spin(directionType::fwd,(Controller1.Axis4.value()),velocityUnits::pct);
+			    DownRight.spin(directionType::rev,(Controller1.Axis4.value()),velocityUnits::pct);
+		    }
+
+		    if(Controller1.ButtonL1.pressing()){
+			    IntakeMotor.spin(directionType::fwd, 50,velocityUnits::pct);
+		    }
+        
+            if(Controller1.ButtonX.pressing()){
+                vex::task::sleep(3000);
+                drivingMode = !drivingMode;
+            }
+
+            Controller1.ButtonR1.pressed(launch);
+        }
+
+        while(!drivingMode){
+		    Brain.Screen.print("Tank Control mode active");
+
+		    UpLeft.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
+		    DownLeft.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
+		    UpRight.spin(directionType::fwd,(Controller1.Axis2.value()),velocityUnits::pct);
+		    DownRight.spin(directionType::fwd,(Controller1.Axis2.value()),velocityUnits::pct);
+		
+		    if(Controller1.ButtonL1.pressing()){
+                IntakeMotor.spin(directionType::fwd, 50,velocityUnits::pct);
+		    }
+
+            Controller1.ButtonR1.pressed(launch);
+
+            if(Controller1.ButtonX.pressing()){
+                vex::task::sleep(3000);
+                drivingMode = !drivingMode;
+            }
+	    }
+    }
+}
+ 
