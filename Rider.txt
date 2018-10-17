@@ -4,12 +4,15 @@
     /*
         Code written by Rider Bishop. This code works with both an arcade and tank control. 
         The 2 modes can be switched by holding X for 3 seconds.
-        Version 1.1 (10/16/18)
+        Version 1.2 (10/16/18)
+
+	- 1.2 Just changed version to demonstrate gitHub.
     */
         
 void launch() { 
     
     LauncherMotor.rotateFor(360, deg);
+    //Example new code
     }
 
 int main() {
@@ -17,10 +20,10 @@ int main() {
     Brain.Screen.print("Robot Control Started");
 	vex::task::sleep(2000);
 	int xPressed = 0;
+	//downLeft was deleted below
 	/*  motors
 	upLeft
 	upRight
-	downLeft
 	downRight
 	intakeMotor
 	launcherMotor		
