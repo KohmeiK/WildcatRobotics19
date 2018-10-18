@@ -4,8 +4,9 @@
     /*
         Code written by Rider Bishop. This code works with both an arcade and tank control. 
         The 2 modes can be switched by holding X for 3 seconds.
-        Version 1.4 (10/17/18)
-        Changed xPressed int vairable to be a boolean.
+        Version 1.5 (10/18/18)
+        Added new motors to control   .
+        
     */
         
 void launch() { 
@@ -27,12 +28,15 @@ int main() {
 	downLeft
 	downRight
 	intakeMotor
-	launcherMotor		
+	launcherMotor
+    
+    capFlipperMotor
+    CapLiftMotor
 	*/
     
     while(1){
         
-	    while(drivingMode) {
+	    while(drivingMode){
 
 		    Brain.Screen.print("Arcade Control mode active");
 
@@ -59,16 +63,34 @@ int main() {
 			    DownRight.spin(directionType::rev,(Controller1.Axis4.value()),velocityUnits::pct);
 		    }
 
+
 		    if(Controller1.ButtonL1.pressing()){
+
+		    	//There is no "directiontype" or "velocityUnits" because i think those are unnecessary, and are only there for documentation. 
+		    	CapLiftMotor.spin(fwd,75,pct);
+		    }
+
+		    if(Controller1.ButtonL2.pressing()){
+		    	CapLiftMotor.spin(fwd,-75,pct);
+		    }
+
+		    if(Controller1.ButtonUp.pressing()){
+		    	CapFlipperMotor.spin(fwd,50,pct);
+		    }
+
+		    if(Controller1.ButtonDown.pressing()){
+		    	CapFlipperMotor.spin(fwd,-50,pct);
+		    }
+
+		    if(Controller1.ButtonR1.pressing()){
 			    IntakeMotor.spin(directionType::fwd, 50,velocityUnits::pct);
 		    }
         
             if(Controller1.ButtonX.pressing()){
-                vex::task::sleep(3000);
                 drivingMode = !drivingMode;
             }
 
-            Controller1.ButtonR1.pressed(launch);
+            Controller1.ButtonR2.pressed(launch);
         }
 
         while(!drivingMode){
@@ -78,15 +100,32 @@ int main() {
 		    DownLeft.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
 		    UpRight.spin(directionType::fwd,(Controller1.Axis2.value()),velocityUnits::pct);
 		    DownRight.spin(directionType::fwd,(Controller1.Axis2.value()),velocityUnits::pct);
-		
+
 		    if(Controller1.ButtonL1.pressing()){
+
+		    	//There is no "directiontype" or "velocityUnits" because i think those are unnecessary, and are only there for documentation. 
+		    	CapLiftMotor.spin(fwd,75,pct);
+		    }
+
+		    if(Controller1.ButtonL2.pressing()){
+		    	CapLiftMotor.spin(fwd,-75,pct);
+		    }
+
+		    if(Controller1.ButtonUp.pressing()){
+		    	CapFlipperMotor.spin(fwd,50,pct);
+		    }
+
+		    if(Controller1.ButtonDown.pressing()){
+		    	CapFlipperMotor.spin(fwd,-50,pct);
+		    }
+		
+		    if(Controller1.ButtonR1.pressing()){
                 IntakeMotor.spin(directionType::fwd, 50,velocityUnits::pct);
 		    }
 
-            Controller1.ButtonR1.pressed(launch);
+            Controller1.ButtonR2.pressed(launch);
 
             if(Controller1.ButtonX.pressing()){
-                vex::task::sleep(3000);
                 drivingMode = !drivingMode;
             }
 	    }
