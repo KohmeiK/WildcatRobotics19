@@ -1,26 +1,68 @@
 #include "robot-config.h"
 
-
     /*
         Code written by Rider Bishop. This code works with both an arcade and tank control. 
         The 2 modes can be switched by holding X for 3 seconds.
-        Version 1.5 (10/18/18)
-        Added new motors to control   .
-        
+        Version 2.2 (10/19/18)
+        Changed many controller value calls to variables 
     */
-        
-void launch() { 
-    
+
+//space for global vairables
+
+double controllerAxis1;
+double controllerAxis2;
+double controllerAxis3;
+double controllerAxis4;
+
+bool controllerButtonUp;
+bool controllerButtonDown;
+bool controllerButtonL1;
+bool controllerButtonL2;
+bool controllerButtonR1;
+bool controllerButtonR2;
+bool contorllerButtonX;
+
+void launch(){
     //rotate the launcher motor one rotation, so the arm throws the ball
     LauncherMotor.rotateFor(360, deg);
     }
 
+void arcadeControlDrive(){
+	UpLeft.spin(fwd,controllerAxis3,pct);          
+    UpRight.spin(fwd,controllerAxis3,pct);
+    DownLeft.spin(fwd,controllerAxis3,pct);
+    DownRight.spin(fwd,controllerAxis3,pct);
+
+	//for turning left (might need to change the negitives to the other motors, cuz i dont know the layout, or just completly change them)
+    if(Controller1.Axis4.value() <= -25){
+	    UpLeft.spin(directionType::rev,controllerAxis4,pct);          
+	    UpRight.spin(fwd,controllerAxis4,pct);
+	    DownLeft.spin(directionType::rev,controllerAxis4,pct);
+	    DownRight.spin(fwd,controllerAxis4,pct);
+    }
+	//for turning right
+    if(Controller1.Axis4.value() >= 25){
+        UpLeft.spin(fwd,controllerAxis4,pct);          
+	    UpRight.spin(directionType::rev,controllerAxis4,pct);
+	    DownLeft.spin(fwd,controllerAxis4,pct);
+	    DownRight.spin(directionType::rev,controllerAxis4,pct);
+	}
+}
+
+void tankControlDrive(){
+	UpLeft.spin(fwd,controllerAxis3,pct);
+	DownLeft.spin(fwd,controllerAxis3,pct);
+	UpRight.spin(fwd,controllerAxis2,pct);
+	DownRight.spin(fwd,controllerAxis2,pct);
+}
+
 int main() {
-	
-    Brain.Screen.print("Robot Control Started");
+    
+    Controller1.Screen.setCursor(1,1);
+    Controller1.Screen.print("Robot Control Started");
 	vex::task::sleep(1000);
     
-    //
+    
 	bool drivingMode = true;
 	/*  motors
 	
@@ -34,101 +76,64 @@ int main() {
     CapLiftMotor
 	*/
     
+    //declare vairables for the contorller values here.
+    
     while(1){
+        //initualizing vairables
         
-	    while(drivingMode){
-
-		    Brain.Screen.print("Arcade Control mode active");
-
-    	    //for driving forward and backward (there is no turning)
-		
-		    UpLeft.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);          
-		    UpRight.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
-		    DownLeft.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
-		    DownRight.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
-
-		    //for turning left (might need to change the negitives to the other motors, cuz i dont know the layout, or just completly change them)
-		    if(Controller1.Axis4.value() <= -25){
-			    UpLeft.spin(directionType::rev,(Controller1.Axis4.value()),velocityUnits::pct);          
-			    UpRight.spin(directionType::fwd,(Controller1.Axis4.value()),velocityUnits::pct);
-			    DownLeft.spin(directionType::rev,(Controller1.Axis4.value()),velocityUnits::pct);
-			    DownRight.spin(directionType::fwd,(Controller1.Axis4.value()),velocityUnits::pct);
-		    }
-
-		    //for turning right
-		    if(Controller1.Axis4.value() >= 25){
-                UpLeft.spin(directionType::fwd,(Controller1.Axis4.value()),velocityUnits::pct);          
-			    UpRight.spin(directionType::rev,(Controller1.Axis4.value()),velocityUnits::pct);
-			    DownLeft.spin(directionType::fwd,(Controller1.Axis4.value()),velocityUnits::pct);
-			    DownRight.spin(directionType::rev,(Controller1.Axis4.value()),velocityUnits::pct);
-		    }
-
-
-		    if(Controller1.ButtonL1.pressing()){
-
-		    	//There is no "directiontype" or "velocityUnits" because i think those are unnecessary, and are only there for documentation. 
-		    	CapLiftMotor.spin(fwd,75,pct);
-		    }
-
-		    if(Controller1.ButtonL2.pressing()){
-		    	CapLiftMotor.spin(fwd,-75,pct);
-		    }
-
-		    if(Controller1.ButtonUp.pressing()){
-		    	CapFlipperMotor.spin(fwd,50,pct);
-		    }
-
-		    if(Controller1.ButtonDown.pressing()){
-		    	CapFlipperMotor.spin(fwd,-50,pct);
-		    }
-
-		    if(Controller1.ButtonR1.pressing()){
-			    IntakeMotor.spin(directionType::fwd, 50,velocityUnits::pct);
-		    }
+        controllerAxis1 = Controller1.Axis1.value();
+        controllerAxis2 = Controller1.Axis2.value();
+        controllerAxis3 = Controller1.Axis3.value();
+        controllerAxis4 = Controller1.Axis4.value();
         
-            if(Controller1.ButtonX.pressing()){
-                drivingMode = !drivingMode;
-            }
-
-            Controller1.ButtonR2.pressed(launch);
-        }
-
-        while(!drivingMode){
-		    Brain.Screen.print("Tank Control mode active");
-
-		    UpLeft.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
-		    DownLeft.spin(directionType::fwd,(Controller1.Axis3.value()),velocityUnits::pct);
-		    UpRight.spin(directionType::fwd,(Controller1.Axis2.value()),velocityUnits::pct);
-		    DownRight.spin(directionType::fwd,(Controller1.Axis2.value()),velocityUnits::pct);
-
-		    if(Controller1.ButtonL1.pressing()){
-
-		    	//There is no "directiontype" or "velocityUnits" because i think those are unnecessary, and are only there for documentation. 
-		    	CapLiftMotor.spin(fwd,75,pct);
-		    }
-
-		    if(Controller1.ButtonL2.pressing()){
-		    	CapLiftMotor.spin(fwd,-75,pct);
-		    }
-
-		    if(Controller1.ButtonUp.pressing()){
-		    	CapFlipperMotor.spin(fwd,50,pct);
-		    }
-
-		    if(Controller1.ButtonDown.pressing()){
-		    	CapFlipperMotor.spin(fwd,-50,pct);
-		    }
-		
-		    if(Controller1.ButtonR1.pressing()){
-                IntakeMotor.spin(directionType::fwd, 50,velocityUnits::pct);
-		    }
-
-            Controller1.ButtonR2.pressed(launch);
-
-            if(Controller1.ButtonX.pressing()){
-                drivingMode = !drivingMode;
-            }
+        controllerButtonUp = Controller1.ButtonUp.pressing();
+        controllerButtonDown = Controller1.ButtonDown.pressing();
+        controllerButtonL1 = Controller1.ButtonL1.pressing();
+        controllerButtonL2 = Controller1.ButtonL2.pressing();
+        controllerButtonR1 = Controller1.ButtonR1.pressing();
+        controllerButtonR2 = Controller1.ButtonR2.pressing();
+        contorllerButtonX = Controller1.ButtonX.pressing();
+        
+        //initualize the controller vairable values here.   
+	    if(drivingMode){
+            Controller1.Screen.clearLine();
+            Controller1.Screen.print("Arcade Control active");
+	    	arcadeControlDrive();
 	    }
+
+	    if(!drivingMode){
+            Controller1.Screen.clearScreen();
+            Controller1.Screen.print("Tank Control Active");
+	    	tankControlDrive();
+	    }
+
+		if(controllerButtonL1){
+		  	//There is no "directiontype" or "velocityUnits" because i think those are unnecessary, and are only there for documentation. 
+	    	CapLiftMotor.spin(fwd,75,pct);
+		}
+
+		if(controllerButtonL2){
+		   	CapLiftMotor.spin(fwd,-75,pct);
+		}
+
+		if(controllerButtonUp){
+		  	CapFlipperMotor.spin(fwd,50,pct);
+		}
+
+		if(controllerButtonDown){
+		   	CapFlipperMotor.spin(fwd,-50,pct);
+		}
+
+		if(controllerButtonR1){
+		    IntakeMotor.spin(fwd,50,pct);
+		}
+        
+        Controller1.ButtonR2.pressed(launch);
+        
+        if(Controller1.ButtonX.pressing()){
+            vex::task::sleep(3000);
+            drivingMode = !drivingMode;
+        }
     }
 }
  
