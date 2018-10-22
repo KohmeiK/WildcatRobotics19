@@ -1,0 +1,47 @@
+#include "robot-config.h"
+          
+
+//here are some functions for basic movement
+void moveForward(int power, int time){
+	UpLeft.spin(directionType::fwd, power, pct);
+	UpRight.spin(directionType::fwd, power, pct);
+	DownLeft.spin(directionType::fwd, power, pct);
+	Downright.spin(directionType::fwd, power, pct);
+
+	vex::task::sleep(time);
+}   
+
+void turn(int power, int time){
+	//positive power = turn left, negitive power = turn right
+	UpLeft.spin(directionType::rev, power, pct);
+	UpRight.spin(directionType::fwd, power, pct);
+	DownLeft.spin(directionType::rev, power, pct);
+	Downright.spin(directionType::fwd, power, pct);
+
+	vex::task::sleep(time);
+}   
+
+void liftFlipper(bool up){
+	//if true, lift flipper up, if false, move it down  
+	if(up){
+	CapLiftMotor.spin(fwd,75,pct);
+	vex::task::sleep(/*some amount of time*/);
+	}
+
+	else{
+		CapLiftMotor.spin(directionType::rev,75,pct);
+		vex::task::sleep(/*some amount of time*/);
+	}
+}
+
+void flipCap(){
+	CapFlippermotor.spin(fwd, 1, velocityUnits::rot)
+}
+
+
+
+//below there will be the possible autonomous functions, 
+
+int main() {
+
+}
