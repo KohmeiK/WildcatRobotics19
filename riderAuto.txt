@@ -11,14 +11,12 @@ void moveForward(int power, int time){
 	vex::task::sleep(time);
 }   
 
-void turn(int power, int time){
-	//positive power = turn left, negitive power = turn right
-	UpLeft.spin(directionType::rev, power, pct);
-	UpRight.spin(directionType::fwd, power, pct);
-	DownLeft.spin(directionType::rev, power, pct);
-	Downright.spin(directionType::fwd, power, pct);
-
-	vex::task::sleep(time);
+void turn(int degrees){
+	//positive degrees = turn left, negitive degrees = turn right
+	UpLeft.spin(directionType::rev, degrees, velocityUnits::deg);
+	UpRight.spin(directionType::fwd, degrees, velocityUnits::deg);
+	DownLeft.spin(directionType::rev, degrees, velocityUnits::deg);
+	Downright.spin(directionType::fwd, degrees, velocityUnits::deg);
 }   
 
 void liftFlipper(bool up){
@@ -35,13 +33,151 @@ void liftFlipper(bool up){
 }
 
 void flipCap(){
-	CapFlippermotor.spin(fwd, 1, velocityUnits::rot)
+	CapFlippermotor.spin(fwd, 1, velocityUnits::rot);
+}
+
+void launch(){
+	LauncherMotor.spin(fwd, 1, velocityUnits::rot);
+}
+
+//below there will be the possible autonomous functions, 
+
+void flipCapLaunchLeft(int target){
+
+	//none of the times are final
+	//there will be a parameter to determine how close the robot should get to the target, to choose wihch target to launch the ball
+
+	//turn to the wall
+	turn(180);
+	//move to the wall
+	moveForward(75, 1000);
+	//turn to the cap
+	turn(-180);
+	//move to the cap
+	moveForward(75, 1000);
+	//flip the cap
+	flipCap();
+	//leave the cap
+	moveForward(-75, 1000);
+	//turn to the targets
+	turn(-180);
+	//move to the targets, depending on which target is bieng aimed for
+
+	if(target == 1){
+		moveForward(75, 500);
+	}
+	else if(target == 2){
+		moveForward(75, 750);
+	}
+	else{ //aim for bottom target
+		moveForward(75, 1000);
+	}
+
+	//launch the ball
+	launch();
+
+	//end program
+}
+
+void launchFlipCapRight(){
+
+	//move forward
+	moveForward(75, 1000);
+	//turn to the target
+	turn(-180);
+
+	//move to the target depending on which on is being targeted
+	if(target == 1){
+		moveForward(75, 500);
+	}
+	else if(target == 2){
+		moveForward(75, 750);
+	}
+	else{ //aim for bottom target
+		moveForward(75, 1000);
+	}
+
+	//launch the ball at targe
+	launch();
+
+	//move to the wall
+	moveForward(75, 1000);
+	
+	//turn to the cap
+	turn(180);
+	
+	//move to the cap
+	moveForward(75, 1000);
+	
+	//filp the cap
+	flipCap();
+	
+	//leave the cap
+	moveForward(-75, 1000);
+	
+	//turn to the parking zone
+	turn(180);
+	
+	//move to the parking zone
+	moveForward(75, 1000);
 }
 
 
 
-//below there will be the possible autonomous functions, 
 
 int main() {
+
+	
+
+}
+
+
+void pre_auton(){
+	//here is where the autonomous program can be selected
+	//first, choose between right or left
+
+	//resolution = 480x272
+
+	bool side; //true for left, false for right
+	bool continue = true; //used for getting out of while loop
+
+	Brain.Screen.setOrigin(0,0);
+
+	int xPos;
+    int yPos;
+
+    Brain.Screen.printAt(25, 25, "Which side is the robot starting on?")
+
+    //left
+    Brain.Screen.DrawRectangle();
+    Brian.Screen.printAt(100,100, "Left");
+
+    //right
+    Brain.Screen.DrawRectangle();
+    Brain.Screen.printAt(300, 100, "Right");
+
+    while(continue){
+    	xPos = Brain.Screen.xPosition();
+        yPos = Brain.Screen.yPosition();
+
+   		if((xPos > 25 && xPos < 200) && (yPos > 50 && yPos < 225)){
+   			side = true;
+   			continue = false;
+    	}
+    	else if((xPos > 225 && xPos < 455) && (yPos > 50 && yPos < 255 )){
+    		side = false;
+    		continue = false;
+    	}
+    }
+
+    Brain.Screen.clearScreen();
+
+    Brain.Screen.printAt(25,25, "Which target is the robot aiming for?");
+
+    Brain.Screen.DrawRectangle();
+    Brain.Screen.DrawRectangle();
+    Brain.Screen.DrawRectangle();
+
+
 
 }
