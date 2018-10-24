@@ -1,48 +1,51 @@
 #include "robot-config.h"
-          
+
+bool side; //true for left, false for right
+bool pass; //used for getting out of while loop
+int target;
 
 //here are some functions for basic movement
 void moveForward(int power, int time){
 	UpLeft.spin(directionType::fwd, power, pct);
 	UpRight.spin(directionType::fwd, power, pct);
 	DownLeft.spin(directionType::fwd, power, pct);
-	Downright.spin(directionType::fwd, power, pct);
+	DownRight.spin(directionType::fwd, power, pct);
 
 	vex::task::sleep(time);
-}   
+}
 
 void turn(int degrees){
 	//positive degrees = turn left, negitive degrees = turn right
-	UpLeft.spin(directionType::rev, degrees, velocityUnits::deg);
-	UpRight.spin(directionType::fwd, degrees, velocityUnits::deg);
-	DownLeft.spin(directionType::rev, degrees, velocityUnits::deg);
-	Downright.spin(directionType::fwd, degrees, velocityUnits::deg);
-}   
+    UpLeft.rotateTo(degrees, deg);
+    UpRight.rotateTo(degrees, deg);
+    DownLeft.rotateTo(degrees, deg);
+    DownRight.rotateTo(degrees, deg);
+}
 
 void liftFlipper(bool up){
-	//if true, lift flipper up, if false, move it down  
+	//if true, lift flipper up, if false, move it down
 	if(up){
 	CapLiftMotor.spin(fwd,75,pct);
-	vex::task::sleep(/*some amount of time*/);
+	vex::task::sleep(1000);
 	}
 
 	else{
 		CapLiftMotor.spin(directionType::rev,75,pct);
-		vex::task::sleep(/*some amount of time*/);
+		vex::task::sleep(1000);
 	}
 }
 
 void flipCap(){
-	CapFlippermotor.spin(fwd, 1, velocityUnits::rot);
+	CapFlipperMotor.rotateTo(360, deg);
 }
 
 void launch(){
-	LauncherMotor.spin(fwd, 1, velocityUnits::rot);
+	LauncherMotor.rotateTo(360, deg);
 }
 
-//below there will be the possible autonomous functions, 
+//below there will be the possible autonomous functions,
 
-void flipCapLaunchLeft(int target){
+void flipCapLaunchLeft(){
 
 	//none of the times are final
 	//there will be a parameter to determine how close the robot should get to the target, to choose wihch target to launch the ball
@@ -80,7 +83,6 @@ void flipCapLaunchLeft(int target){
 }
 
 void launchFlipCapRight(){
-
 	//move forward
 	moveForward(75, 1000);
 	//turn to the target
@@ -102,22 +104,22 @@ void launchFlipCapRight(){
 
 	//move to the wall
 	moveForward(75, 1000);
-	
+
 	//turn to the cap
 	turn(180);
-	
+
 	//move to the cap
 	moveForward(75, 1000);
-	
+
 	//filp the cap
 	flipCap();
-	
+
 	//leave the cap
 	moveForward(-75, 1000);
-	
+
 	//turn to the parking zone
 	turn(180);
-	
+
 	//move to the parking zone
 	moveForward(75, 1000);
 }
@@ -127,7 +129,14 @@ void launchFlipCapRight(){
 
 int main() {
 
-	
+  if(side){
+    //left side
+    flipCapLaunchLeft();
+  }
+  else{
+    //right side
+    launchFlipCapRight();
+  }
 
 }
 
@@ -138,46 +147,94 @@ void pre_auton(){
 
 	//resolution = 480x272
 
-	bool side; //true for left, false for right
-	bool continue = true; //used for getting out of while loop
-
 	Brain.Screen.setOrigin(0,0);
 
 	int xPos;
     int yPos;
 
-    Brain.Screen.printAt(25, 25, "Which side is the robot starting on?")
+    Brain.Screen.printAt(25, 25, "Which side is the robot starting on?");
 
     //left
-    Brain.Screen.DrawRectangle();
-    Brian.Screen.printAt(100,100, "Left");
+    Brain.Screen.drawRectangle(50, 50, 125, 125);
+    Brain.Screen.printAt(100,100, "Left");
 
     //right
-    Brain.Screen.DrawRectangle();
-    Brain.Screen.printAt(300, 100, "Right");
+    Brain.Screen.drawRectangle(200, 50, 125, 125);
+    Brain.Screen.printAt(250, 100, "Right");
 
-    while(continue){
+    while(pass){
     	xPos = Brain.Screen.xPosition();
         yPos = Brain.Screen.yPosition();
 
    		if((xPos > 25 && xPos < 200) && (yPos > 50 && yPos < 225)){
    			side = true;
-   			continue = false;
+        //get out of while loop
+   			pass = false;
     	}
     	else if((xPos > 225 && xPos < 455) && (yPos > 50 && yPos < 255 )){
     		side = false;
-    		continue = false;
+    		pass = false;
     	}
     }
 
     Brain.Screen.clearScreen();
 
+    vex::task::sleep(1000);
+
     Brain.Screen.printAt(25,25, "Which target is the robot aiming for?");
 
-    Brain.Screen.DrawRectangle();
-    Brain.Screen.DrawRectangle();
-    Brain.Screen.DrawRectangle();
+    Brain.Screen.drawRectangle(50, 75, 100, 175);
+    Brain.Screen.drawRectangle(175, 75, 100, 175);
+    Brain.Screen.drawRectangle(300, 75, 100, 175  );
+
+    pass = true;
 
 
+    while(pass){
+    	xPos = Brain.Screen.xPosition();
+      yPos = Brain.Screen.yPosition();
+        //print text
+      Brain.Screen.printAt(75, 125, "Top Target");
+      Brain.Screen.printAt(200, 125, "Middle Target");
+      Brain.Screen.printAt(325, 125, "Low Target");
 
+   		if((xPos > 50 && xPos < 150) && (yPos > 75 && yPos < 250)){
+        target = 1;
+        //get out of while loop
+   			pass = false;
+    	}
+    	else if((xPos > 175 && xPos < 275) && (yPos > 75 && yPos < 250)){
+    		target = 2;
+    		pass = false;
+    	}
+      else if((xPos > 300 && xPos < 400) && (yPos > 75 && yPos < 250 )){
+    		target = 3;
+    		pass = false;
+    	}
+    }
+
+    Brain.Screen.clearScreen();
+
+    if(side){
+      if(target == 1){
+        Brain.Screen.printAt(100, 125, "Starting position: Left, Target: Top");
+      }
+      if(target == 2){
+        Brain.Screen.printAt(100, 125, "Starting position: Left, Target: Middle");
+      }
+      if(target == 3){
+        Brain.Screen.printAt(100, 125, "Starting position: Left, Target: Bottom");
+      }
+    }
+    else if(!side){
+      if(target == 1){
+        Brain.Screen.printAt(100, 125, "Starting position: Right, Target: Top");
+      }
+      if(target == 2){
+        Brain.Screen.printAt(100, 125, " Starting position: Right, Target: Middle");
+      }
+      if(target == 3){
+        Brain.Screen.printAt(100, 125, " Starting position: Right, Target: Bottom");
+      }
+    }
 }
